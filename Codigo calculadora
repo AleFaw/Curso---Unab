@@ -1,0 +1,118 @@
+#include <Keypad.h>  //Teclado matricial.
+#include <Wire.h> //Para los pines de conexión
+#include <LiquidCrystal.h> //Comandos de pantalla lcd.
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8); //Pines de la pantalla.
+
+long first = 0;  //Datos de entrada de la calculadora.
+long second = 0; //Datos de entrada de la calculadora.
+double total = 0; //Resultado.
+char customKey; //Permite escribir los numeros en pantalla.
+const byte ROWS = 4;  //Calcula un byte por cada fila.
+const byte COLS = 4; //Calcula un byte por cada columna.
+
+char keys [ROWS] [COLS] ={ //Creo una matriz de los caracteres del teclado.
+  {'1','2','3','+'},
+  {'4','5','6','-'},
+  {'7','8','9','*'},
+  {'C','0','=','/'}
+};
+
+byte rowPins [ROWS] = {7,6,5,4}; //Pines de salida de arduino para filas.
+byte colPins[COLS] = {3,2,1,0}; //Pines de salida de arduino para columnas
+Keypad customKeypad = Keypad {makeKeymap (keys), rowPins,colPins, ROWS, COLS};
+  
+void setup(){
+  lcd.begin(16, 2); //Inicio pantalla.
+  for (int i=0;i<=3;i++)
+    lcd.setCursor(0,0);
+  	lcd.print("CALCULADORA"); //Mostrar un mensaje por la pantalla.
+  	lcd.setCursor(0,1);
+  	lcd.print("UNAB - E.E");//Mostrar un mensaje por la pantalla.
+  	delay(4000); //Retardo de 4s.
+ 	lcd.clear(); //Limpia la pantalla.
+  	lcd.setCursor(0, 0);
+}
+
+void loop()
+{
+  customKey = customKeypad.getKey(); //Obtiene lo que tocamos en el teclado.
+   switch(customKey)
+   {
+     case '0' ... '9': // de 0 hasta 9.
+     lcd.setCursor(0,0); //Almacena valor hasta presionar un operador.
+     first = first * 10 + (customKey - '0'); //Muestra el primer carecter
+     lcd.print(first);
+     break;
+     
+     case '+':
+     first = (total != 0 ? total:first); //Vemos si la suma es igual a 0
+      lcd.setCursor(0,1);
+     lcd.print("+");
+     second = Numerodos();
+     total = first + second;
+     lcd.setCursor(0,3);
+     lcd.print(total);
+     first = 0; //reseteamos a 0.
+     second = 0; //reseteamos a 0.
+     break;
+     
+     case '-':
+     first = (total != 0 ? total:first); //Vemos si la resta es igual a 0
+      lcd.setCursor(0,1);
+     lcd.print("-");
+     second = Numerodos();
+     total = first - second;
+     lcd.setCursor(0,3);
+     lcd.print(total);
+     first = 0; //reseteamos a 0.
+     second = 0; //reseteamos a 0.
+     break;
+     
+     case '*':
+     first = (total != 0 ? total:first); //Vemos si la multiplicacion es igual a 0
+      lcd.setCursor(0,1);
+     lcd.print("*");
+     second = Numerodos();
+     total = first * second;
+     lcd.setCursor(0,3);
+     lcd.print(total);
+     first = 0; //reseteamos a 0.
+     second = 0; //reseteamos a 0.
+     break;
+     
+     case '/':
+     first = (total != 0 ? total:first); //Vemos si la resta es igual a 0
+      lcd.setCursor(0,1);
+     lcd.print("/");
+     second = Numerodos();
+     total = first / second;
+     lcd.setCursor(0,3);
+     second == 0 ? lcd.print("invalid") : total = (float) first/ (float) second;
+     lcd.print(total);
+     first = 0; //reseteamos a 0.
+     second = 0; //reseteamos a 0.
+     break;
+     
+     case 'C': //Borra toda la pantalla.
+     total =0;
+     lcd.clear();
+     break;
+   }
+}
+
+long Numerodos ()
+{
+  while(1)
+  {
+    customKey = customKeypad.getKey();
+    if(customKey >='0' && customKey<='9')
+    {
+      second = second * 10 + (customKey - '0');
+      lcd.setCursor(0,2);
+      lcd.print(second);
+    }
+    if(customKey == '=') break;
+  }
+  return second;
+}
