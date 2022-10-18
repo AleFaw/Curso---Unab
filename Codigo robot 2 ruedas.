@@ -1,0 +1,103 @@
+/*Variables de los motores.*/
+int adelanteM1 = 6; //Positivo
+int reversaM1 = 7; //Negativo
+int adelanteM2 = 4; //Positivo
+int reversaM2 = 5; //Negativo
+
+/*Variables del sensor.*/
+int trig = 2;
+int echo = 3;
+int tiempo;
+int distancia;
+
+/*Variables de luz RGB*/
+int rojo = 10;
+int azul = 9;
+int verde = 8;
+
+void setup()
+{
+  /*pinMode de los motores.*/
+  pinMode(adelanteM1, OUTPUT);
+  pinMode(adelanteM2, OUTPUT);
+  pinMode(reversaM1, OUTPUT);
+  pinMode(reversaM2, OUTPUT);
+  
+  /*pinMode del sensor.*/
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+  
+  /*pinMode de luz RGB*/
+  pinMode(rojo, OUTPUT);
+  pinMode(azul, OUTPUT);
+  pinMode(verde, OUTPUT);
+  
+  /*Serial begin para trabajar con el monitor en serie*/
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  /*
+      IR HACIA ADELANTE
+  digitalWrite(adelanteM1, HIGH);
+  digitalWrite(adelanteM2, HIGH); 
+  delay(5000);
+  
+       IR HACIA ATRAS
+  digitalWrite(reversaM1, HIGH);
+  digitalWrite(reversaM2, HIGH); 
+  delay(5000);
+  
+            FRENAR
+  digitalWrite(reversaM1, LOW); 
+  digitalWrite(reversaM2, LOW);
+  delay(2000);
+  
+       GIRAR HACIA LA DERECHA
+  digitalWrite(adelanteM1, HIGH); 
+  digitalWrite(adelanteM2, LOW);
+  delay(5000);
+  
+      GIRAR HACIA LA IZQUIERDA
+  digitalWrite(adelanteM2, HIGH); 
+  digitalWrite(adelanteM1, LOW);
+  delay(5000);
+  */
+  
+  digitalWrite(trig,HIGH);
+  delay(1);
+  digitalWrite(trig,LOW);
+  tiempo = pulseIn(echo, HIGH);
+  distancia = tiempo / 58.2; //la pasa a cm.
+  Serial.println(distancia);
+  delay(500);
+  
+  digitalWrite(adelanteM1,HIGH);
+  digitalWrite(adelanteM2,HIGH);
+  digitalWrite(verde,HIGH);
+  digitalWrite(azul,LOW); //Al ir hacia adelante va en rojo.
+  digitalWrite(rojo,LOW);
+  
+  if(distancia<50)
+  {
+    //Si hay cerca deja de adelantar
+    digitalWrite(adelanteM1,LOW);
+  	digitalWrite(adelanteM2,LOW);
+    digitalWrite(verde,LOW);
+    digitalWrite(rojo,HIGH); //Prende el rojo por ir en reversa.
+    //Luego retrocede
+    digitalWrite(reversaM1,HIGH);
+  	digitalWrite(reversaM2,HIGH);
+    delay(5000);
+    //Deja de retroceder
+    digitalWrite(rojo,LOW);
+    digitalWrite(reversaM1,LOW);
+  	digitalWrite(reversaM2,LOW);
+    //Gira
+    digitalWrite(azul,HIGH);
+    digitalWrite(adelanteM1,HIGH);
+    delay(3000);
+    digitalWrite(azul,LOW);
+  }
+}
